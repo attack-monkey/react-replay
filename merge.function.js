@@ -1,0 +1,1 @@
+export const merge = (oldObj, newObj) => Object.assign({}, oldObj, newObj)

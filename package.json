@@ -1,0 +1,19 @@
+{
+  "name": "react-replay",
+  "version": "1.0.0",
+  "description": "A React wrapper with auto-render, routes, and redux-like state-management",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "react",
+    "functional",
+    "redux"
+  ],
+  "author": "attack-monkey",
+  "license": "ISC",
+  "dependencies": {
+    "react-dom": "^16.8.6"
+  }
+}

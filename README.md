@@ -1,0 +1,190 @@
+# react-replay
+
+react-replay is a light wrapper around React that provides:
+
+- auto-rerender
+- routing
+- redux-like state management
+
+## Install
+
+Just the package:
+
+```
+
+npm i react-replay
+
+```
+
+## Basics
+
+### Components
+
+react-replay is a lightweight frontend similar to React + Redux, but with only the functional parts.
+
+This means much of React can be left behind in favour of simple functional components.
+
+eg.
+
+```jsx
+
+// jsx
+
+export const MyComponent = ({ state }) => (
+  <div>
+    <h1>{ state.greeting }</h1>
+    <ChildComponent state={ state }></ChildComponent>
+  </div>
+) 
+
+```
+
+## Dispatching Actions
+
+Use `dispatch` to dispatch one or more actions.
+An action is just a simple object that gets passed into your 'masterReducer' function to re-create state.
+
+After each dispatch the view is rerendered automatically unless:
+
+- You dispatch an action with the rerender field set to false eg. `{ type: 'SILENT', rerender: false }`
+- Or you dispatch multiple actions in the one dispatch. All actions except the last will have `rerender: false` applied to them automatically, so that only the last action results in a rerender. 
+
+For example in the below snippet, the rerender will wait for ACTION_2 
+
+```javascript
+
+dispatch(
+  { type: 'ACTION_1' },
+  { type: 'ACTION_2' }
+)
+
+```
+
+Example of dispatch applied to an `onClick`
+
+```jsx
+
+// jsx
+
+export const MyComponent = ({ state }) => (
+  <div>
+    <h1>{ state.greeting }</h1>
+    <ChildComponent state={ state }></ChildComponent>
+    <button onClick={ 
+      () => dispatch({ type: 'CHANGE_GREETING', to: 'Hello World'}) 
+    }>push me</button>
+  </div>
+) 
+
+```
+
+### Goto
+
+To change routes just use `goto`
+
+```jsx
+
+// jsx
+
+export const MyComponent = ({ state }) => (
+  <div>
+    <h1>{ state.greeting }</h1>
+    <ChildComponent state={ state }></ChildComponent>
+    <button onClick={ 
+      () => goto('/animals/cats?cat=charlie') 
+    }>push me</button>
+  </div>
+) 
+
+```
+
+Clicking on the button will change the route and also change `state.route` to 
+
+```javascript
+
+{
+  segments: [
+    '',
+    'animals',
+    'cats'
+  ],
+  queryString: {
+    cat: 'charlie'
+  }
+}
+
+```
+
+## Reducers
+
+Your master reducer is a function that resolves to a state object.
+
+It accepts an action, along with the current state and produces a new state object
+
+In it's simplist terms it looks like...
+
+```javascript
+
+export const reducer = ({ state, action }) => ({
+  greeting: 'hello world'
+})
+
+```
+
+Of course this would always produce a new state of 
+
+```javascript
+
+{
+  greeting: 'hello world'
+}
+
+```
+
+To make it so that it takes in an action to produce a new state, we create smaller reducer functions that do the heavy lifting...
+
+```javascript
+
+import { greetingReducer } from '...'
+
+export const reducer = ({ state, action }) => ({
+  greeting: greetingReducer(action, state.greeting))
+})
+
+```
+
+```javascript
+
+/* greetingReducer
+ * ---------------
+ * Accepts actions such as { type: 'CHANGE_GREETING', to: '...' }
+ *
+ */
+
+import { safe } from '../../utils/react-replay/safe.function'
+
+export const greetingReducer = (action, state = 'Hello World') =>
+  safe(action, ['type']) &&
+  safe(action, ['to']) &&
+  action.type === 'CHANGE_GREETING'
+    ? action.to
+    : state
+
+```
+
+If the reducer gets an action that it cares about it computes a new state for `state.greeting` otherwise it just returns the current state. Note that it also has a default state set to 'Hello World'.
+
+If you are wondering what that `safe` function is doing, well it tests whether `action.type` and `action.to` exist. If they do exist then `safe` returns their value. Otherwise `safe` returns `undefined`. This stops us having to write things like ... `if (action && action.type)...`.
+
+### Putting it altogether
+
+```javascript
+
+import { app } from '';
+import { FirstComponent } from '...';
+import { reducer } from '...';
+
+const mount = document.getElementById('app');
+app(FirstComponent, reducer, mount);
+
+```
