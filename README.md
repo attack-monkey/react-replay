@@ -16,6 +16,18 @@ npm i react-replay
 
 ```
 
+Install from seed project:
+
+```
+
+npx douglas get react-replay-seed
+
+```
+
+> Note that the seed project uses [parcel](https://parceljs.org/) for it's javascript bundling. 
+> To install parcel globally - `npm i -g parcel-bundler`
+> Once installed - `npm start` to start the dev server.
+
 ## Basics
 
 ### Components
@@ -64,7 +76,7 @@ Example of dispatch applied to an `onClick`
 
 ```jsx
 
-// jsx
+import { dispatch } from 'react-replay'
 
 export const MyComponent = ({ state }) => (
   <div>
@@ -84,7 +96,7 @@ To change routes just use `goto`
 
 ```jsx
 
-// jsx
+import { goto } from 'react-replay'
 
 export const MyComponent = ({ state }) => (
   <div>
@@ -161,7 +173,7 @@ export const reducer = ({ state, action }) => ({
  *
  */
 
-import { safe } from '../../utils/react-replay/safe.function'
+import { safe } from 'react-replay/safe.function'
 
 export const greetingReducer = (action, state = 'Hello World') =>
   safe(action, ['type']) &&
@@ -180,11 +192,11 @@ If you are wondering what that `safe` function is doing, well it tests whether `
 
 ```javascript
 
-import { app } from '';
-import { FirstComponent } from '...';
-import { reducer } from '...';
+import { app } from 'react-replay'
+import { FirstComponent } from '...'
+import { reducer } from '...'
 
-const mount = document.getElementById('app');
-app(FirstComponent, reducer, mount);
+const mount = document.getElementById('app')
+app(FirstComponent, reducer, mount)
 
 ```
