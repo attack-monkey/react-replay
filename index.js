@@ -20,10 +20,8 @@ const extractQueryString = () => {
 }
 
 const returnRouteObject = () => ({
-  route: {
-    segements: window.location.pathname.split('/'),
-    queryString: extractQueryString()
-  }
+  segments: window.location.pathname.split('/'),
+  queryString: extractQueryString()
 })
 
 export const dispatchOnce = action => {
@@ -87,7 +85,10 @@ export const app = ($view, $actions, $container) => {
   container = $container
   view = $view
   actions = $actions
-  state = Object.assign({}, actions({ state: {}, undefined }), {
+  const initState = Object.assign({}, actions({ state: {}, undefined }), {
+    route: returnRouteObject()
+  })
+  state = Object.assign({}, actions({ state: initState, undefined }), {
     route: returnRouteObject()
   })
   window.onpopstate = () => {
