@@ -6,6 +6,13 @@ react-replay is a light wrapper around React that provides:
 - routing
 - redux-like state management
 
+Replay is an event-loop driven application.  
+When an action is dispatched the whole application state is re-calculated.  
+When state changes from the previous state, React's diffing algorithm is utilised.  
+Only the parts of the DOM that change are updated - resulting in an efficient re-render.
+
+As a result, the entire application can be made from Functional / Stateless Components.
+
 ## Install
 
 Just the package:
@@ -188,7 +195,7 @@ If the reducer gets an action that it cares about it computes a new state for `s
 
 If you are wondering what that `safe` function is doing, well it tests whether `action.type` and `action.to` exist. If they do exist then `safe` returns their value. Otherwise `safe` returns `undefined`. This stops us having to write things like ... `if (action && action.type)...`.
 
-### Putting it altogether
+## Putting it altogether
 
 ```javascript
 
@@ -200,3 +207,9 @@ const mount = document.getElementById('app')
 app(FirstComponent, reducer, mount)
 
 ```
+
+## How State Change and Rerender work tldr;
+
+Whenever an action is dispatched, the current application state is retrieved, and both the state and the action are passed through the main reducer (Redux pattern). Even if an asynchronous activity triggered a separate process, once dispatch is called, the **current application state** is retrieved. At the end of the new state recalculation, this new state becomes the  **current application state**. Even if `{ rerender: false }` is used in the action - the current application state is still updated. This keeps the application in sync - even across asynchronous activity.
+
+The rerender process only kicks in if the new state is different from the old state AND if `{ rerender: false }` was not passed into the action. Only then will the diffing algorithm kick in to update only the DOM nodes that require change.
