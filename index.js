@@ -78,6 +78,7 @@ export const getSubscription = key => subscriptions[key]
 export const goto = path => {
   history.pushState(undefined, '', path)
   state.route = returnRouteObject()
+  Object.assign(state, actions({ state, undefined }))
   return render(view, state, container)
 }
 
