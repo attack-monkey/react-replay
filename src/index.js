@@ -27,9 +27,8 @@ const returnRouteObject = () => ({
 export const dispatchOnce = action => {
   const updateState = args => {
     const { state, action } = args
-    const newState = Object.assign({}, actions({ state, action }), {
-      route: returnRouteObject()
-    })
+    state.route = returnRouteObject()
+    const newState = Object.assign({}, actions({ state, action }))
     const stateChanged = JSON.stringify(newState) !== JSON.stringify(state)
     stateChanged
       ? /* state mutation */ Object.assign(state, newState)
@@ -94,6 +93,7 @@ export const app = ($view, $actions, $container) => {
   })
   window.onpopstate = () => {
     state.route = returnRouteObject()
+    Object.assign(state, actions({ state, undefined }))
     return render(view, state, container)
   }
   render(view, state, container)
