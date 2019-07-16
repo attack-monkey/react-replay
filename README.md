@@ -15,13 +15,7 @@ As a result, the entire application can be made from Functional / Stateless Comp
 
 ## Install
 
-Just the package:
-
-```
-
-npm i react-replay
-
-```
+**The fastest way to get a project going is to install from seed using douglas. douglas installs the project and downloads all the dependencies.**
 
 Install from seed project:
 
@@ -34,6 +28,14 @@ npx douglas get react-replay-seed
 > Note that the seed project uses [parcel](https://parceljs.org/) for it's javascript bundling. 
 > To install parcel globally - `npm i -g parcel-bundler`
 > Once installed - `npm start` to start the dev server.
+
+Just the package:
+
+```
+
+npm i react-replay
+
+```
 
 ## Basics
 
@@ -65,7 +67,7 @@ An action is just a simple object that gets passed into your 'masterReducer' fun
 
 After each dispatch the view is rerendered automatically unless:
 
-- You dispatch an action with the rerender field set to false eg. `{ type: 'SILENT', rerender: false }`
+- You dispatch an action with the rerender field set to false eg. `{ type: '...', rerender: false }`
 - Or you dispatch multiple actions in the one dispatch. All actions except the last will have `rerender: false` applied to them automatically, so that only the last action results in a rerender. 
 
 For example in the below snippet, the rerender will wait for ACTION_2 
@@ -180,20 +182,17 @@ export const reducer = ({ state, action }) => ({
  *
  */
 
-import { safe } from 'react-replay/safe.function'
-
 export const greetingReducer = (action, state = 'Hello World') =>
-  safe(action, ['type']) &&
-  safe(action, ['to']) &&
-  action.type === 'CHANGE_GREETING'
-    ? action.to
-    : state
+  action &&
+    action.type &&
+    action.to &&
+    action.type === 'CHANGE_GREETING'
+      ? action.to
+      : state
 
 ```
 
 If the reducer gets an action that it cares about it computes a new state for `state.greeting` otherwise it just returns the current state. Note that it also has a default state set to 'Hello World'.
-
-If you are wondering what that `safe` function is doing, well it tests whether `action.type` and `action.to` exist. If they do exist then `safe` returns their value. Otherwise `safe` returns `undefined`. This stops us having to write things like ... `if (action && action.type)...`.
 
 ## Putting it altogether
 
