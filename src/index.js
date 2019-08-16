@@ -4,9 +4,14 @@ import { merge } from './merge.function'
 
 let actions, state, container, view, subscriptions = {}
 
-const extractQueryString = () => {
+const getSearchFromHash = hash => {
+  const hashMatchArray = hash.match(/\?[^]*/)
+  return hashMatchArray && Array.isArray(hashMatchArray) ? hashMatchArray[0] : undefined
+}
+
+const extractQueryString = string => {
   try {
-    return window.location.search
+    return string
       .match(/(&|\?)[^&]*|(&|\?)[^\n]/g)
       .map(qs => qs.replace(/\?|&/g, ''))
       .reduce(
@@ -19,10 +24,35 @@ const extractQueryString = () => {
   }
 }
 
-const returnRouteObject = () => ({
-  segments: window.location.pathname.split('/'),
-  queryString: extractQueryString()
-})
+const extractQueryStringFromSearch = () => extractQueryString(window.location.search)
+const extractQueryStringFromHash = () => extractQueryString(getSearchFromHash(window.location.hash))
+const queryString = () => extractQueryStringFromSearch() || extractQueryStringFromHash()
+
+const returnRouteObject = () => {
+  console.log(`path ${window.location.pathname}`)
+  console.log(`hash ${window.location.hash}`)
+  console.log(`search ${window.location.search}`)
+  console.log(`magic search ${JSON.stringify(queryString())}`)
+  const pathArrayStep1 = window.location.pathname.split('/')
+  const lastKey = pathArrayStep1.length -1
+  // if last path array item is '' then remove it
+  const pathArrayStep2 = pathArrayStep1[lastKey] === '' ? pathArrayStep1.slice(0, lastKey) : pathArrayStep1
+  const hashArrayStep1 = window.location.hash
+  .replace(/\?[^]*/, '')
+  .replace('#/', '')
+  .split('/')
+  console.log(`hash** ${hashArrayStep1}`)
+  const hashArrayStep2 =
+    hashArrayStep1.length === 1 && hashArrayStep1[0] === ""
+      ? []
+      : hashArrayStep1
+  const segments = pathArrayStep2.concat(hashArrayStep2)
+  return {
+    segments,
+    queryString: extractQueryString()
+  }
+}
+
 
 export const dispatchOnce = action => {
   const updateState = args => {
@@ -77,7 +107,7 @@ export const getSubscription = key => subscriptions[key]
 export const goto = path => {
   history.pushState(undefined, '', path)
   state.route = returnRouteObject()
-  Object.assign(state, actions({ state, undefined }))
+  Object.assign(state, actions({ state, action: { type: 'ROUTE_CHANGE' } }))
   return render(view, state, container)
 }
 
@@ -85,15 +115,20 @@ export const app = ($view, $actions, $container) => {
   container = $container
   view = $view
   actions = $actions
-  const initState = Object.assign({}, actions({ state: {}, undefined }), {
+  const initState = Object.assign({}, actions({ state: {}, action: { type: 'LOADING_APP' } }), {
     route: returnRouteObject()
   })
-  state = Object.assign({}, actions({ state: initState, undefined }), {
+  state = Object.assign({}, actions({ state: initState, action: { type: 'INITIALISING_STATE' } }), {
     route: returnRouteObject()
   })
   window.onpopstate = () => {
     state.route = returnRouteObject()
-    Object.assign(state, actions({ state, undefined }))
+    Object.assign(state, actions({ state, action: { type: 'ROUTE_CHANGE' } }))
+    return render(view, state, container)
+  }
+  window.onhashchange = () => {
+    state.route = returnRouteObject()
+    Object.assign(state, actions({ state, action: { type: 'ROUTE_CHANGE' } }))
     return render(view, state, container)
   }
   render(view, state, container)
