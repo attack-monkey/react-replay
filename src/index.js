@@ -29,10 +29,6 @@ const extractQueryStringFromHash = () => extractQueryString(getSearchFromHash(wi
 const queryString = () => extractQueryStringFromSearch() || extractQueryStringFromHash()
 
 const returnRouteObject = () => {
-  console.log(`path ${window.location.pathname}`)
-  console.log(`hash ${window.location.hash}`)
-  console.log(`search ${window.location.search}`)
-  console.log(`magic search ${JSON.stringify(queryString())}`)
   const pathArrayStep1 = window.location.pathname.split('/')
   const lastKey = pathArrayStep1.length -1
   // if last path array item is '' then remove it
@@ -41,7 +37,6 @@ const returnRouteObject = () => {
   .replace(/\?[^]*/, '')
   .replace('#/', '')
   .split('/')
-  console.log(`hash** ${hashArrayStep1}`)
   const hashArrayStep2 =
     hashArrayStep1.length === 1 && hashArrayStep1[0] === ""
       ? []
@@ -49,7 +44,7 @@ const returnRouteObject = () => {
   const segments = pathArrayStep2.concat(hashArrayStep2)
   return {
     segments,
-    queryString: extractQueryString()
+    queryString: queryString()
   }
 }
 
