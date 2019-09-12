@@ -13,6 +13,17 @@ Only the parts of the DOM that change are updated - resulting in an efficient re
 
 As a result, the entire application can be made from Functional / Stateless Components.
 
+Need a guide to functional components?
+
+_The following is a really good resource that may help overcome some issues..._
+
+https://www.robinwieruch.de/react-function-component
+
+Note however that React-Replay takes a single-state redux-like approach where actions are dispatched on an event firing.
+The action and previous state get passed through the redux-like reducer to produce a new state.
+So most components in React-Replay have `state` passed from top to bottom through it's props.
+
+
 ## Install
 
 **The fastest way to get a project going is to install from seed using douglas. douglas installs the project and downloads all the dependencies.**
