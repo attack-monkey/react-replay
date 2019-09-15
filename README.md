@@ -40,6 +40,14 @@ npx douglas get react-replay-seed
 > To install parcel globally - `npm i -g parcel-bundler`
 > Once installed - `npm start` to start the dev server.
 
+Install from typescript seed project: 
+
+```
+
+npx douglas get react-replay-seed-for-ts
+
+```
+
 Just the package:
 
 ```
