@@ -104,7 +104,7 @@ Example of dispatch applied to an `onClick`
 
 ```jsx
 
-import { dispatch } from 'react-replay'
+import { dispatch } from '../node_modules/react-replay/src'
 
 export const MyComponent = ({ state }) => (
   <div>
@@ -124,7 +124,7 @@ To change routes just use `goto`
 
 ```jsx
 
-import { goto } from 'react-replay'
+import { goto } from '../node_modules/react-replay/src'
 
 export const MyComponent = ({ state }) => (
   <div>
@@ -217,12 +217,26 @@ If the reducer gets an action that it cares about it computes a new state for `s
 
 ```javascript
 
-import { app } from 'react-replay'
+import { app } from '../node_modules/react-replay/src'
 import { FirstComponent } from '...'
 import { reducer } from '...'
 
 const mount = document.getElementById('app')
 app(FirstComponent, reducer, mount)
+
+```
+
+Optionally you can also add an initial state object at this app bootstrapping stage...
+
+```javascript
+
+import { app } from '../node_modules/react-replay/src'
+import { FirstComponent } from '...'
+import { reducer } from '...'
+
+const initState = { greeting: 'Yo Sup' }
+const mount = document.getElementById('app')
+app(FirstComponent, reducer, mount, initState)
 
 ```
 

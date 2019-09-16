@@ -106,11 +106,11 @@ export const goto = path => {
   return render(view, state, container)
 }
 
-export const app = ($view, $actions, $container) => {
+export const app = ($view, $actions, $container, $initialState) => {
   container = $container
   view = $view
   actions = $actions
-  const initState = Object.assign({}, actions({ state: {}, action: { type: 'LOADING_APP' } }), {
+  const initState = Object.assign({}, actions({ state: $initialState || {}, action: { type: 'LOADING_APP' } }), {
     route: returnRouteObject()
   })
   state = Object.assign({}, actions({ state: initState, action: { type: 'INITIALISING_STATE' } }), {
