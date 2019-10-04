@@ -13,17 +13,6 @@ Only the parts of the DOM that change are updated - resulting in an efficient re
 
 As a result, the entire application can be made from Functional / Stateless Components.
 
-Need a guide to functional components?
-
-_The following is a really good resource that may help overcome some issues..._
-
-https://www.robinwieruch.de/react-function-component
-
-Note however that React-Replay takes a single-state redux-like approach where actions are dispatched on an event firing.
-The action and previous state get passed through the redux-like reducer to produce a new state.
-So most components in React-Replay have `state` passed from top to bottom through it's props.
-
-
 ## Install
 
 **The fastest way to get a project going is to install from seed using douglas. douglas installs the project and downloads all the dependencies.**
@@ -58,9 +47,19 @@ npm i react-replay
 
 ## Basics
 
-### Components
-
 react-replay is a lightweight frontend similar to React + Redux, but with only the functional parts.
+
+There are 3 main parts to React-Replay:
+
+- State
+- Components
+- Reducers
+
+**Components** are almost always just functional / stateless components, and take in **State** to render a view.  
+Events such as `onClick` trigger **Actions** to be dispatched to the Root **Reducer**' which update **State**.  
+Whenever the **State** is updated, the view is rerendered.
+
+### Components
 
 This means much of React can be left behind in favour of simple functional components.
 
@@ -79,6 +78,9 @@ export const MyComponent = ({ state }) => (
 
 ```
 
+The above is a stateless / functional component. It's essentially just a function that takes in props;  
+in this case `state`; and returns the component. Notice how we've also got a child component that we're also passing state into.
+
 ## Dispatching Actions
 
 Use `dispatch` to dispatch one or more actions.
@@ -86,7 +88,7 @@ An action is just a simple object that gets passed into your 'masterReducer' fun
 
 After each dispatch the view is rerendered automatically unless:
 
-- You dispatch an action with the rerender field set to false eg. `{ type: '...', rerender: false }`
+- You dispatch an action with the rerender field set to false eg. `{ type: 'MY_ACTION', rerender: false }`
 - Or you dispatch multiple actions in the one dispatch. All actions except the last will have `rerender: false` applied to them automatically, so that only the last action results in a rerender. 
 
 For example in the below snippet, the rerender will wait for ACTION_2 
@@ -118,46 +120,12 @@ export const MyComponent = ({ state }) => (
 
 ```
 
-### Goto
-
-To change routes just use `goto`
-
-```jsx
-
-import { goto } from '../node_modules/react-replay/src'
-
-export const MyComponent = ({ state }) => (
-  <div>
-    <h1>{ state.greeting }</h1>
-    <ChildComponent state={ state }></ChildComponent>
-    <button onClick={ 
-      () => goto('/animals/cats?cat=charlie') 
-    }>push me</button>
-  </div>
-) 
-
-```
-
-Clicking on the button will change the route and also change `state.route` to 
-
-```javascript
-
-{
-  segments: [
-    '',
-    'animals',
-    'cats'
-  ],
-  queryString: {
-    cat: 'charlie'
-  }
-}
-
-```
+Based on the above component expecting `state.greeting` and the action being of type 'CHANGE_GREETING',
+let's take a look at the corresponding Reducer.
 
 ## Reducers
 
-Your master reducer is a function that resolves to a state object.
+Your master or root reducer is a function that resolves to a state object.
 
 It accepts an action, along with the current state and produces a new state object
 
@@ -171,7 +139,7 @@ export const reducer = ({ state, action }) => ({
 
 ```
 
-Of course this would always produce a new state of 
+This however would always produce a new state of 
 
 ```javascript
 
@@ -201,19 +169,60 @@ export const reducer = ({ state, action }) => ({
  *
  */
 
-export const greetingReducer = (action, state = 'Hello World') =>
-  action &&
-    action.type &&
-    action.to &&
-    action.type === 'CHANGE_GREETING'
-      ? action.to
-      : state
+export const greetingReducer = (action, greetingState = 'Hello World') =>
+  action.type === 'CHANGE_GREETING'
+    ? action.to
+    : greetingState
 
 ```
 
-If the reducer gets an action that it cares about it computes a new state for `state.greeting` otherwise it just returns the current state. Note that it also has a default state set to 'Hello World'.
+When the `greetingReducer` gets an action that it cares about, it computes a new state, otherwise it just returns the current state.  
+Note that it also has a default state set to 'Hello World'.
+
+### Goto
+
+The last part to React-Replay is the routing...
+
+To change routes just use `goto`
+
+```jsx
+
+import { goto } from '../node_modules/react-replay/src'
+
+export const MyComponent = ({ state }) => (
+  <div>
+    <h1>{ state.greeting }</h1>
+    <ChildComponent state={ state }></ChildComponent>
+    <button onClick={ 
+      () => goto('/animals/cats?cat=charlie') 
+    }>push me</button>
+  </div>
+) 
+
+```
+
+Clicking on the button will change the route (and url) and also change `state.route` to 
+
+```javascript
+
+{
+  segments: [
+    '',
+    'animals',
+    'cats'
+  ],
+  queryString: {
+    cat: 'charlie'
+  }
+}
+
+```
+
+> Note that hashes can also be used in routes and simply form part of the segments (as though the hash didn't exist).
 
 ## Putting it altogether
+
+To bootstrap the application we wrap the First (outer most) Component, along with the root reducer and a mount (The DOM node the app should go into).
 
 ```javascript
 
